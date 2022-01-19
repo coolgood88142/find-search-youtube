@@ -35,9 +35,8 @@ window.onload = function () {
     
   }
 
-  function generateTbody() {
+  function generateTbody(href) {
     let key = 'AIzaSyAMfAMS2HiWv9jcN_HGCcn-eiC3aqBYdYg'
-    let href = location.href.indexOf('=')
     let vidioID = location.href.substring(href+1, location.href.length)
     axios.get('https://www.googleapis.com/youtube/v3/videos?id='+ vidioID +'&type=video&key=' + key + '&part=snippet').then((response) => {
       let data = response.data.items[0]
@@ -93,7 +92,7 @@ window.onload = function () {
         </div>
         <!--Reload Button-->
         <div class="button-panel">
-          <button id="reload">Back to photo</button>
+          <input type="button" id="reload" value="回上一頁" onClick="window.location.reload()"/>
         </div>
       </section>
     `
@@ -127,13 +126,18 @@ window.onload = function () {
     // show error message if getUrl is false or clickImg is null
     if (!request.getUrl || !clickedViedo) { return showErrorMessage() }
     // generate tbody
-    generateTbody()
+    //根據目前的網址來確認是否為YT，不是YT就顯示訊息，如果是YT的嵌入式影片要另外抓資料
+    if(clickedViedo.baseURI.indexOf('https://www.youtube.com/watch') != -1){
+      generateTbody(location.href.indexOf('='))
+    }else if(clickedViedo.localName == 'iframe'){
+      generateTbody(clickedViedo.src.indexOf('='))
+    }else{
+      alert('請到Youtube網站查詢影片資訊')
+    }
     // generate the report with tbody
     // generateTable(tbodyInnerHTML)
     // listen to url click to copy url
     document.querySelectorAll('.url').forEach(link => link.addEventListener('click', copyUrl))
-    // listen to reload button click to lead user back to image page
-    document.getElementById('reload').addEventListener('click', () => window.location.reload())
   }
 
   // listen to contextmenu being opened and save the target image

@@ -12,9 +12,9 @@ section {
 }
 
 section .table-container {
-  max-width: 700px;
+  max-width: 1200px;
   margin: 0 auto;
-  max-height: 260px;
+  max-height: 460px;
   border-radius: .4rem;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -94,7 +94,6 @@ div.button-panel {
 
 .button-panel #reload {
   padding: .5rem;
-  font-weight: 500;
   font-size: 1rem;
   color: white;
   border-style: none;
