@@ -132,7 +132,7 @@ window.onload = function () {
     }else if(clickedViedo.localName == 'iframe'){
       generateTbody(clickedViedo.src.indexOf('='))
     }else{
-      alert('請到Youtube網站查詢影片資訊')
+      alert('請選擇Youtube網站影片')
     }
     // generate the report with tbody
     // generateTable(tbodyInnerHTML)

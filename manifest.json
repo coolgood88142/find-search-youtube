@@ -31,6 +31,9 @@
       "js": [
         "js/axios.min.js",
         "js/content.js"
+      ],
+      "css": [
+        "css/content.css"
       ]
     }
   ],
