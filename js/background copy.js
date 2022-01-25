@@ -1,31 +1,35 @@
-window.onload = function () {
-  let clickedViedo = null
+chrome.contextMenus.create( {  
+  "id": "showVideoInfo",
+  "title": "ShowVideoInfo",
+  "contexts": ["all"] 
+})
+
+
+let clickedViedo = null
+document.addEventListener('contextmenu', event => clickedViedo = event.target)
+chrome.runtime.onMessage.addListener(generateReport)
+  
+chrome.contextMenus.onClicked.addListener(function (info, tab) {
+    if (info.menuItemId === "showVideoInfo") { 
+      chrome.tabs.create();
+
+      // listen to contextmenu being opened and save the target image
+      
+    }else{
+      return
+    }
+})
+
 
   // generate a table for each format
   function generateTableRow(title, release, info, releaseDate, tags, link) {
     generateTable( `
       <tr>
-        <td>標題</td>
         <td>${title}</td>
-      </tr>
-      <tr>
-        <td>發佈者</td>
         <td>${release}</td>
-      </tr>
-      <tr>
-        <td>影片資訊</td>
         <td>${info}</td>
-      </tr>
-      <tr>
-        <td>發佈日期</td>
         <td>${releaseDate}</td>
-      </tr>
-      <tr>
-        <td>標籤</td>
         <td>${tags}</td>
-      </tr>
-      <tr>
-        <td>連結</td>
         <td class="url">
           <span class="link">${link}</span>
           <span class="tooltip-text">Click to copy</span>
@@ -93,8 +97,12 @@ window.onload = function () {
           <table class="table mb-0">
             <thead class="thead-dark">
               <tr>
-                <th scope="col" style="width:10%">資訊名稱</th>
-                <th scope="col">資料</th>
+                <th scope="col">標題</th>
+                <th scope="col">發佈者</th>
+                <th scope="col">影片資訊</th>
+                <th scope="col">發佈日期</th>
+                <th scope="col">標籤</th>
+                <th scope="col">連結</th>
               </tr>
             </thead>
             <tbody class="text-secondary">
@@ -286,12 +294,3 @@ window.onload = function () {
     // listen to url click to copy url
     document.querySelectorAll('.url').forEach(link => link.addEventListener('click', copyUrl))
   }
-
-  // listen to contextmenu being opened and save the target image
-  document.addEventListener('contextmenu', event => clickedViedo = event.target)
-
-
-  // listen to message request from the extension: background.js
-  chrome.runtime.onMessage.addListener(generateReport)
-
-}

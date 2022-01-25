@@ -7,11 +7,11 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Placeholder Image</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css">
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
   <link href="https://fonts.googleapis.com/css?family=Cabin+Sketch:400,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/pop.css">
-  <link rel="stylesheet" href="css/content.css">
+  <!-- <link rel="stylesheet" href="css/content.css"> -->
   <style>
 
   </style>
@@ -19,7 +19,7 @@
 
 <body>
   <!--Find Royalty Free Viedo-->
-  <section class="bg-white border rounded p-2">
+  <section class="bg-white border rounded p-2" style="background: #4CA1AF;">
     <form id='search-viedo'>
       <legend class='text-secondary'>搜尋Youtube影片</legend>
       <!--Second row-->
@@ -30,8 +30,25 @@
         </div>
       </div>
 
-      <div id="viedo"></div>
+      <div id="viedo">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/yPkS7yiTHP4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+      </div>
+      <!--撥放-->
     </form>
+    <nav aria-label="Page navigation example" class="isPagination" style="display:none;">
+      <ul class="pagination">
+        <li class="page-item" id="Previous">
+          <a class="page-link" tabindex="-1" aria-disabled="true">上一頁</a>
+        </li>
+        <li class="page-item" id="Next">
+          <a class="page-link">下一頁</a>
+        </li>
+      </ul>
+    </nav>
+
+    <input type="hidden" id="nextPageToken" value="">
+    <input type="hidden" id="prevPageToken" value="">
   </section>
 
   <script src="js/popup.js"></script>

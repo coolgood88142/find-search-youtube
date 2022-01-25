@@ -3,7 +3,9 @@
   "version": "1.2",
   "description": "Quickly Search Youtube ",
   "permissions": [
-    "contextMenus"
+    "contextMenus",
+    "scripting",
+    "tabs"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -15,7 +17,7 @@
     }
   },
   "background": {
-    "service_worker": "js/background.js"
+    "service_worker": "background.js"
   },
   "icons": {
     "16": "images/image16.png",
@@ -31,9 +33,6 @@
       "js": [
         "js/axios.min.js",
         "js/content.js"
-      ],
-      "css": [
-        "css/content.css"
       ]
     }
   ],
