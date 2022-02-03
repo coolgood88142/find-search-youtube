@@ -5,7 +5,9 @@
   "permissions": [
     "contextMenus",
     "scripting",
-    "tabs"
+    "activeTab",
+    "tabs",
+    "storage"
   ],
   "action": {
     "default_popup": "popup.html",

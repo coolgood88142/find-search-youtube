@@ -64,12 +64,17 @@ window.onload = function () {
       let date = new Date(data.snippet.publishedAt);
       const releaseDate = date.getFullYear() + "-" + ((date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1) + "-" + (date.getDate() < 10 ? "0" + date.getDate() : date.getDate())
       let tags = '';
-      data.snippet.tags.forEach(function(value){
-        tags += value + ',';
-      });
 
-      if(tags != ''){
-        tags = tags.substring(0, tags.length-1)
+      if(data.snippet.tags !== null && data.snippet.tags !== undefined){
+        data.snippet.tags.forEach(function(value){
+          tags += value + ',';
+        });
+  
+        if(tags != ''){
+          tags = tags.substring(0, tags.length-1)
+        }
+      }else {
+        tags = '無標籤'
       }
 
       const link = 'https://www.youtube.com/watch?v=' + data.id
@@ -269,7 +274,7 @@ window.onload = function () {
     document.querySelector('.closebtn').addEventListener('click', event => event.target.parentElement.remove())
   }
 
-  function generateReport(request, sender, sendResponse) {
+  function generateReport(request) {
     // show error message if getUrl is false or clickImg is null
     if (!request.getUrl || !clickedViedo) { return showErrorMessage() }
     // generate tbody
@@ -289,9 +294,125 @@ window.onload = function () {
 
   // listen to contextmenu being opened and save the target image
   document.addEventListener('contextmenu', event => clickedViedo = event.target)
+  chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
+    if(request.greeting == 'setVideo') {
+      if(request.state){
+        let bgVideo = document.getElementById('bgVideo')
+  
+        if(bgVideo == null){
+          let div = document.createElement('div')
+          div.id = 'bgVideo'
+          div.style.display = 'none'
+          div.innerHTML = request.state
+          document.getElementsByTagName("body")[0].appendChild(div)
+        }else{
+          bgVideo.innerHTML = request.state
+          document.getElementsByTagName("body")[0].appendChild(bgVideo)
+        }
 
+        // let src = document.getElementsByTagName("iframe")[0].src
+        // document.getElementsByTagName("iframe")[0].src = src + '?autoplay=1'
+      }
+    }
+
+    generateReport(request)
+
+    // if(request.greeting == 'closedPupop'){
+    //   console.log('套件頁面關閉')
+    // }
+
+  })
+
+  var evt = document.createEvent('MouseEvents');
+  evt.initEvent('play', true, true);
+  var some_element = document;
+  some_element.dispatchEvent(evt);
+
+  document.addEventListener('play', function(e){
+    // chrome.extension.sendMessage({play : true}, function(response) {
+    //   const img = document.querySelectorAll("[id^='playVideoImg']")
+    //   for (var i = 0; i < img.length; i++) {
+    //     img[i].onclick = function(){
+          console.log('test')
+          // let id = this.id.substring(this.id.indexOf('playVideoImg'), this.id.length);
+          // document.getElementById('' +)
+          // ytp-large-play-button ytp-button
+          // console.log(id)
+        // }
+    //   }
+
+    // });
+  })
+
+//   document.addEventListener('play', function(e){
+//     //send message to ext
+//     var someInformation = {/*your msg here*/}
+//     chrome.extension.sendMessage(someInformation, function(response) {
+//        //callback
+//     });
+//  }, false);
 
   // listen to message request from the extension: background.js
-  chrome.runtime.onMessage.addListener(generateReport)
+  // chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
+    
 
+  //   generateReport
+  // });
+
+  // console.log(chrome.action.getUrl('./background.html'))
+
+  // let videoData = document.getElementById('videoData')
+
+  // chrome.action.onClicked.addListener((tab) => {
+  //   chrome.action.setPopup({ tabId: tab.tabId, popup: "popup.html" })
+  //   videoData.appendChild(chrome.action.getUrl('background.html'))
+  // })
+  
 }
+
+const content = '';
+
+function savebodyContent() {
+  content = document.getElementsByTagName("body")[0].innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const img = document.querySelectorAll("[id^='playVideoImg']")
+  
+  // var img = document.getElementById('playVideoImg0')
+  // img.addEventListener('click', function() {
+  //   console.log('xxx');
+  // });
+  
+  for (var i = 0; i < img.length; i++) {
+    img[i].onclick = function(){
+      console.log('test123')
+      // let id = this.id.substring(this.id.indexOf('playVideoImg'), this.id.length);
+      // document.getElementById('' +)
+      // ytp-large-play-button ytp-button
+      // console.log(id)
+    }
+  }
+  })
+  
+
+//收到訊息之後，在目前網頁內容丟隱藏的影片標籤
+
+
+// chrome.runtime.onConnect.addListener(function(port){
+//   port.onDisconnect.addListener(function(event) {
+//     alert(document.getElementsByTagName("body")[0].innerHTML)
+//     // content = document.getElementsByTagName("body")[0].innerHTML;
+//   })
+// })
+
+// chrome.runtime.onConnect.addListener(function (externalPort) {
+//   externalPort.onDisconnect.addListener(function () {
+//     console.log("onDisconnect")
+//     // Do stuff that should happen when popup window closes here
+//   })
+
+//   console.log("onConnect")
+// })
+
+

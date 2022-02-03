@@ -1,0 +1,31 @@
+<div>
+  <form id='search-viedo'>
+    <legend class='text-secondary'>搜尋Youtube影片</legend>
+    <!--Second row-->
+    <div class="input-group input-group-sm my-2 ">
+      <input type="text" class="form-control form-control-sm" id="search-string" placeholder="請輸入關鍵字" required>
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit" id='open-all'>搜尋</button>
+      </div>
+    </div>
+
+    <div id="viedo">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/yPkS7yiTHP4?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <!-- <video src="https://www.youtube.com/embed/yPkS7yiTHP4" controls="true"></video> -->
+    </div>
+    <!--撥放-->
+  </form>
+  <nav aria-label="Page navigation example" class="isPagination" style="display:none;">
+    <ul class="pagination">
+      <li class="page-item" id="Previous">
+        <a class="page-link" tabindex="-1" aria-disabled="true">上一頁</a>
+      </li>
+      <li class="page-item" id="Next">
+        <a class="page-link">下一頁</a>
+      </li>
+    </ul>
+  </nav>
+
+  <input type="hidden" id="nextPageToken" value="">
+  <input type="hidden" id="prevPageToken" value="">
+</div>
