@@ -5,6 +5,14 @@ const key = 'AIzaSyBi-TgEC8NMoWACGvm-IhwXyFlBlxYP7fU'
 let url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&key=' + key
 let index = 1;
 
+// var tag = document.createElement('script');
+// tag.src = "https://www.youtube.com/iframe_api";
+// var firstScriptTag = document.getElementsByTagName('script')[0];
+// firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+// window.addEventListener('click', function(e){
+//   onPlayerStateChange(0)
+// });
+
 const li = document.getElementsByTagName("li");
 for( var x=0; x < li.length; x++ ) {
   li[x].onclick = function(){
@@ -27,7 +35,7 @@ function openImg(obj){
   });
 }
 
-// const img0 = document.getElementById('playVideoImg0');
+// const img0 = document.getElementById('playViedo0');
 // img0.addEventListener("click", function(){
 //   console.log('123354')
 // });
@@ -89,16 +97,22 @@ let body = document.getElementsByTagName("body")[0].innerHTML
 
 function setVideoHtml(items) {
   let context = ''
+  let videoId = []
+  let videoObj = []
+  let videoImg = []
   items.forEach((el, index) => {
     //發佈日期用的格式轉換
     let date = new Date(el.snippet.publishTime);
 
     //這裡要改用createElement的方式建立，之後要定義圖片元件要使用點擊事件
+    // const div = document.createElement('div');
+    // div.setAttribute('class', 'style-scope ytd-item-section-renderer');
     context += 
       '<div class="style-scope ytd-item-section-renderer" prominent-thumb-style="DEFAULT" lockup="true" use-prominent-thumbs="" inline-title-icon="" style="position: relative;">'+
         '<div id="dismissible" class="style-scope ytd-video-renderer">'+
-          '<img id="playVideoImg'+ index +'" width=\"320\" height=\"180\" src=\"' + el.snippet.thumbnails.medium.url  +'\" onClick="openImg(this)" />' +
-          // '<iframe id="playVideo'+ index +'" width=\"320\" height=\"180\" src=\"https://www.youtube.com/embed/' + el.id.videoId  +'\" onClick="openVideo('+el.snippet.thumbnails.medium.url+')"  frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>' +
+          // '<img id="playVideoImg'+ index +'" width=\"320\" height=\"180\" src=\"' + el.snippet.thumbnails.medium.url  +'\" onClick="openImg()" />' +
+          // '<div id="playVideo'+ index +'" class="ytVideo" ></div>' + 
+          '<iframe id="playVideo'+ index +'" class="ytVideo"  width=\"320\" height=\"180\" src=\"https://www.youtube.com/embed/' + el.id.videoId  +'\"?enablejsapi=1 onClick="openVideo('+el.snippet.thumbnails.medium.url+')"  frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>' +
           '<input type="hidden" id="playVideoId'+ index +' value="'+ el.id.videoId +'"">' +
           '<div class="text-wrapper style-scope ytd-video-renderer">'+
               '<div id="meta" class="style-scope ytd-video-renderer">'+
@@ -118,26 +132,83 @@ function setVideoHtml(items) {
             '</div>' +  
         '</div>' +  
       '</div>';   
+
+      videoId.push(el.id.videoId)
+      videoObj.push(new Object())
+      videoImg.push(el.snippet.thumbnails.medium.url)
   });
-
-  document.getElementById("viedo").innerHTML = context
+  document.getElementById("viedo").innerHTML = context    
   chrome.storage.local.clear()
-  // if(searchQuery != searchString.value){
-  searchQuery = searchString.value
-  //   chrome.storage.local.set({
-  //     "body": document.getElementsByTagName("body")[0].innerHTML
-  //   })
-  // }
-
+  chrome.storage.local.set({
+    "body": context,
+    "videoImg": videoImg
+  })
 
   
-  // chrome.storage.local.set({
-  //   "body": document.getElementsByTagName("body")[0].innerHTML
-  // })
+  searchQuery = searchString.value
 
-  // chrome.runtime.connect({ name: "popup", });
+  const video = document.getElementsByTagName('iframe')
+  const count = video.length
 
-  chrome.runtime.sendMessage({saveState: true, state: document.getElementsByTagName("body")[0].innerHTML})
+  if(video != undefined && count > 0){
+    function onYouTubeIframeAPIReady() {
+      videoObj[0] = new YT.Player('playVideo0', {
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange(this, 0)
+        }
+      });
+
+      videoObj[1] = new YT.Player('playVideo1', {
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange(this, 1)
+        }
+      });
+
+      videoObj[2] = new YT.Player('playVideo2', {
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange(this, 2)
+        }
+      });
+
+      videoObj[3] = new YT.Player('playVideo3', {
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange(this, 2)
+        }
+      });
+
+      videoObj[4] = new YT.Player('playVideo4', {
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange(this, 4)
+        }
+      });
+    }
+
+    
+    // for( var x=0; x < count; x++ ) {
+      // video[x].addEventListener('click', function(e){
+      //   // onPlayerStateChange(x)
+      // });
+    // }
+  }
+  
+
+
+  chrome.runtime.sendMessage({
+    saveState: true, 
+    state: document.getElementsByTagName("body")[0],
+    video: video,
+    count: count,
+    videoPlayerImg: document.getElementById('videoPlayerImg'),
+    videoPlayer: document.getElementById("videoPlayer"),
+    videoData: document.getElementById("videoData"),
+    videoObj: videoObj,
+    // li : document.getElementsByTagName("li")
+  })
 
   // body = document.getElementsByTagName("body")[0].innerHTML
   // body = document.getElementsByTagName("body")[0].innerHTML
@@ -149,6 +220,43 @@ function setVideoHtml(items) {
   // download(context, './background.txt', 'text')
 }
 
+function onPlayerReady(e) {
+  let play = document.getElementById("playImg");
+  let pause = document.getElementById("pauseImg");
+
+  play.addEventListener('click', () => {
+    e.target.mute().playVideo();
+  });
+  pause.addEventListener('click', () => e.target.pauseVideo());
+}
+
+function onPlayerStateChange(index) {
+  chrome.storage.local.get('videoImg', (obj) => {
+    document.getElementById('videoPlayerImg').src = obj.videoImg[index]
+  })
+
+  if(document.getElementById("videoPlayer").style.display == 'none'){
+    document.getElementById("videoPlayer").style.display = ''
+    document.getElementById("videoData").style.display = 'none'
+  }
+}
+
+const videoPlay = document.getElementById('play_pause')
+videoPlay.addEventListener('click', () => {
+  if(document.getElementById("playImg").style.display == 'none'){
+    document.getElementById("playImg").style.display = ''
+    document.getElementById("pauseImg").style.display = 'none'
+  } else if(document.getElementById("pauseImg").style.display == 'none'){
+    document.getElementById("playImg").style.display = 'none'
+    document.getElementById("pauseImg").style.display = ''
+  }
+});
+
+// const ytButton = document.getElementsByClassName('video')
+// console.log(ytButton)
+// ytButton.addEventListener('click', function() {
+//     console.log('xxx');
+// });
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -171,8 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function openVideo(img){
-  console.log(img)
+function openVideo(){
+  console.log('twesdfwer')
 }
 
 // (function () {

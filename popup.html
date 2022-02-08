@@ -19,7 +19,7 @@
 
 <body>
   <!--Find Royalty Free Viedo-->
-  <section class="bg-white border rounded p-2" style="background: #4CA1AF;">
+  <section id="videoData" class="bg-white border rounded p-2">
     <form id='search-viedo'>
       <legend class='text-secondary'>搜尋Youtube影片</legend>
       <!--Second row-->
@@ -31,7 +31,8 @@
       </div>
       <!-- <img id="playVideoImg0" width="320" height="180" src="https://i.ytimg.com/vi/T1jds1GuVXg/mqdefault.jpg"> -->
       <div id="viedo">
-        <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/yPkS7yiTHP4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+        <!-- <div id="player"></div> -->
+        <iframe id="playViedo0" class="ytVideo" width="560" height="315" src="https://www.youtube.com/embed/yPkS7yiTHP4" title="YouTube video player" onClick="onPlayerStateChange(0)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         <!-- <video src="https://www.youtube.com/embed/yPkS7yiTHP4" controls="true"></video> -->
       </div>
       <!--撥放-->
@@ -51,9 +52,9 @@
     <input type="hidden" id="prevPageToken" value="">
   </section>
 
-  <section id="play" class="bg-white border rounded p-2" style="display:none;">
-    <img id="videoPlayer" src="">
-    <span id="play_pause" class="controller" title="Click to play / pause song"><img src="baseline-play_arrow-24px.svg" /><img src="baseline-pause-24px.svg" /></span>
+  <section id="videoPlayer" class="bg-white border rounded p-2" style="display:none;">
+    <img id="videoPlayerImg" src="">
+    <span id="play_pause" class="controller" title="Click to play / pause song"><img id="playImg" src="baseline-play_arrow-24px.svg" style="display: none;"/><img id="pauseImg" src="baseline-pause-24px.svg" /></span>
   </section>
 </body>
 
@@ -64,7 +65,7 @@
 <script src="js/popper.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/moment.js"></script>
-<link rel="stylesheet" href="css/bootstrap.min.css">
 <!-- <script src="https://www.youtube.com/iframe_api"></script> -->
+<link rel="stylesheet" href="css/bootstrap.min.css">
 
 </html>

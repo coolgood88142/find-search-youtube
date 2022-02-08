@@ -294,34 +294,38 @@ window.onload = function () {
 
   // listen to contextmenu being opened and save the target image
   document.addEventListener('contextmenu', event => clickedViedo = event.target)
-  chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-    if(request.greeting == 'setVideo') {
-      if(request.state){
-        let bgVideo = document.getElementById('bgVideo')
+
+
+  chrome.runtime.onMessage.addListener(generateReport)
+
+  // chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
+    // if(request.greeting == 'setVideo') {
+    //   if(request.state){
+        // let bgVideo = document.getElementById('bgVideo')
   
-        if(bgVideo == null){
-          let div = document.createElement('div')
-          div.id = 'bgVideo'
-          div.style.display = 'none'
-          div.innerHTML = request.state
-          document.getElementsByTagName("body")[0].appendChild(div)
-        }else{
-          bgVideo.innerHTML = request.state
-          document.getElementsByTagName("body")[0].appendChild(bgVideo)
-        }
+        // if(bgVideo == null){
+        //   let div = document.createElement('div')
+        //   div.id = 'bgVideo'
+        //   div.style.display = 'none'
+        //   div.innerHTML = request.state
+        //   document.getElementsByTagName("body")[0].appendChild(div)
+        // }else{
+        //   bgVideo.innerHTML = request.state
+        //   document.getElementsByTagName("body")[0].appendChild(bgVideo)
+        // }
 
         // let src = document.getElementsByTagName("iframe")[0].src
         // document.getElementsByTagName("iframe")[0].src = src + '?autoplay=1'
-      }
-    }
+    //   }
+    // }
 
-    generateReport(request)
+    // generateReport(request)
 
     // if(request.greeting == 'closedPupop'){
     //   console.log('套件頁面關閉')
     // }
 
-  })
+  // })
 
   var evt = document.createEvent('MouseEvents');
   evt.initEvent('play', true, true);
