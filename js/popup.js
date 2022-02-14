@@ -1,9 +1,51 @@
+// import youtubeApi from './script.js';
+
 const searchViedoForm = document.getElementById('search-viedo')
 const searchString = document.getElementById('search-string')
 // const key = 'AIzaSyAMfAMS2HiWv9jcN_HGCcn-eiC3aqBYdYg'
 const key = 'AIzaSyBi-TgEC8NMoWACGvm-IhwXyFlBlxYP7fU'
 let url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&key=' + key
 let index = 1;
+var player0, player1, player2, player3, player4;
+var youTubePlayer;
+
+// chrome.tabs.executeScript({ code: 'document.body.innerHTML+="<div/>"' }) 
+
+// var tag = document.createElement('script');
+// tag.src = "https://www.youtube.com/iframe_api";
+// document.querySelector('body').appendChild(tag);
+
+
+/**
+ * Main
+ */
+//  (function () {
+//   'use strict';
+
+//   function init() {
+//       // Load YouTube library
+//       var tag = document.createElement('script');
+
+//       tag.src = 'http://www.youtube.com/iframe_api';
+
+//       var first_script_tag = document.getElementsByTagName('script');
+//       console.log(first_script_tag)
+
+//       first_script_tag.parentNode.insertBefore(tag, first_script_tag);
+
+
+//       // Set timer to display infos
+//       // setInterval(youTubePlayerDisplayInfos, 1000);
+//   }
+
+
+//   if (window.addEventListener) {
+//       window.addEventListener('load', init);
+//   } else if (window.attachEvent) {
+//       window.attachEvent('onload', init);
+//   }
+// }());
+
 
 // var tag = document.createElement('script');
 // tag.src = "https://www.youtube.com/iframe_api";
@@ -12,6 +54,112 @@ let index = 1;
 // window.addEventListener('click', function(e){
 //   onPlayerStateChange(0)
 // });
+
+function imgClickVideo(img, index) {
+  img.addEventListener('click', function() {
+    let playVideoId = document.getElementById('playVideoId' + index)
+    youTubePlayer.cueVideoById({suggestedQuality: 'tiny',
+                                videoId: playVideoId.value
+                               });
+    youTubePlayer.pauseVideo();
+    document.getElementById('videoPlayerImg').src = this.src
+    document.getElementById('videoData').style.display = 'none'
+    document.getElementById('videoPlayer').style.display = ''
+    chrome.runtime.sendMessage({
+      playVideo: playVideoId
+    })
+  })
+}
+
+
+function onYouTubeIframeAPIReady() {
+  'use strict';
+
+  var inputVideoId = document.getElementById('YouTube-video-id');
+  var videoId = inputVideoId.value;
+  var suggestedQuality = 'tiny';
+  var height = 180;
+  var width = 320;
+  var youTubePlayerVolumeItemId = 'YouTube-player-volume';
+
+
+  function onError(event) {
+      youTubePlayer.personalPlayer.errors.push(event.data);
+  }
+
+
+  function onReady(event) {
+      var player = event.target;
+
+      player.loadVideoById({suggestedQuality: suggestedQuality,
+                            videoId: videoId
+                           });
+      player.pauseVideo();
+  }
+
+
+  function onStateChange(event) {
+      var volume = Math.round(event.target.getVolume());
+      var volumeItem = document.getElementById(youTubePlayerVolumeItemId);
+
+      if (volumeItem && (Math.round(volumeItem.value) != volume)) {
+          volumeItem.value = volume;
+      }
+  }
+
+
+  youTubePlayer = new YT.Player('YouTube-player',
+                                {videoId: videoId,
+                                 height: height,
+                                 width: width,
+                                 playerVars: {'autohide': 0,
+                                              'cc_load_policy': 0,
+                                              'controls': 2,
+                                              'disablekb': 1,
+                                              'iv_load_policy': 3,
+                                              'modestbranding': 1,
+                                              'rel': 0,
+                                              'showinfo': 0,
+                                              'start': 3
+                                             },
+                                 events: {'onError': onError,
+                                          'onReady': onReady,
+                                          'onStateChange': onStateChange
+                                         }
+                                });
+
+  // Add private data to the YouTube object
+  youTubePlayer.personalPlayer = {'currentTimeSliding': false,
+                                  'errors': []};
+}
+
+function youTubePlayerActive() {
+  'use strict';
+
+  return youTubePlayer && youTubePlayer.hasOwnProperty('getPlayerState');
+}
+
+/**
+ * Pause.
+ */
+ function youTubePlayerPause() {
+  'use strict';
+
+  if (youTubePlayerActive()) {
+      youTubePlayer.pauseVideo();
+  }
+}
+
+/**
+ * Play.
+ */
+ function youTubePlayerPlay() {
+  'use strict';
+
+  if (youTubePlayerActive()) {
+      youTubePlayer.playVideo();
+  }
+}
 
 const li = document.getElementsByTagName("li");
 for( var x=0; x < li.length; x++ ) {
@@ -27,12 +175,6 @@ for( var x=0; x < li.length; x++ ) {
       })
     }
   }
-}
-
-function openImg(obj){
-  obj.addEventListener("click", function(){
-    console.log('123354')
-  });
 }
 
 // const img0 = document.getElementById('playViedo0');
@@ -110,10 +252,10 @@ function setVideoHtml(items) {
     context += 
       '<div class="style-scope ytd-item-section-renderer" prominent-thumb-style="DEFAULT" lockup="true" use-prominent-thumbs="" inline-title-icon="" style="position: relative;">'+
         '<div id="dismissible" class="style-scope ytd-video-renderer">'+
-          // '<img id="playVideoImg'+ index +'" width=\"320\" height=\"180\" src=\"' + el.snippet.thumbnails.medium.url  +'\" onClick="openImg()" />' +
+          '<img id="playVideoImg'+ index +'" width=\"320\" height=\"180\" src=\"' + el.snippet.thumbnails.medium.url  +'\" />' +
           // '<div id="playVideo'+ index +'" class="ytVideo" ></div>' + 
-          '<iframe id="playVideo'+ index +'" class="ytVideo"  width=\"320\" height=\"180\" src=\"https://www.youtube.com/embed/' + el.id.videoId  +'\"?enablejsapi=1 onClick="openVideo('+el.snippet.thumbnails.medium.url+')"  frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>' +
-          '<input type="hidden" id="playVideoId'+ index +' value="'+ el.id.videoId +'"">' +
+          // '<iframe id="playVideo'+ index +'" class="ytVideo"  width=\"320\" height=\"180\" src=\"https://www.youtube.com/embed/' + el.id.videoId  +'\"?enablejsapi=1 onClick="openVideo('+el.snippet.thumbnails.medium.url+')"  frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>' +
+          '<input type="hidden" id="playVideoId'+ index +'" value="'+ el.id.videoId +'">' +
           '<div class="text-wrapper style-scope ytd-video-renderer">'+
               '<div id="meta" class="style-scope ytd-video-renderer">'+
                 '<div id="title-wrapper" class="style-scope ytd-video-renderer">'+
@@ -137,6 +279,7 @@ function setVideoHtml(items) {
       videoObj.push(new Object())
       videoImg.push(el.snippet.thumbnails.medium.url)
   });
+
   document.getElementById("viedo").innerHTML = context    
   chrome.storage.local.clear()
   chrome.storage.local.set({
@@ -150,95 +293,19 @@ function setVideoHtml(items) {
   const video = document.getElementsByTagName('iframe')
   const count = video.length
 
+
   if(video != undefined && count > 0){
-    function onYouTubeIframeAPIReady() {
-      videoObj[0] = new YT.Player('playVideo0', {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange(this, 0)
-        }
-      });
-
-      videoObj[1] = new YT.Player('playVideo1', {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange(this, 1)
-        }
-      });
-
-      videoObj[2] = new YT.Player('playVideo2', {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange(this, 2)
-        }
-      });
-
-      videoObj[3] = new YT.Player('playVideo3', {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange(this, 2)
-        }
-      });
-
-      videoObj[4] = new YT.Player('playVideo4', {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange(this, 4)
-        }
-      });
-    }
-
-    
-    // for( var x=0; x < count; x++ ) {
-      // video[x].addEventListener('click', function(e){
-      //   // onPlayerStateChange(x)
-      // });
-    // }
+    imgClickVideo(document.getElementById('playVideoImg0'), 0)
+    imgClickVideo(document.getElementById('playVideoImg1'), 1)
+    imgClickVideo(document.getElementById('playVideoImg2'), 2)
+    imgClickVideo(document.getElementById('playVideoImg3'), 3)
+    imgClickVideo(document.getElementById('playVideoImg4'), 4)  
   }
-  
-
 
   chrome.runtime.sendMessage({
     saveState: true, 
     state: document.getElementsByTagName("body")[0],
-    video: video,
-    count: count,
-    videoPlayerImg: document.getElementById('videoPlayerImg'),
-    videoPlayer: document.getElementById("videoPlayer"),
-    videoData: document.getElementById("videoData"),
-    videoObj: videoObj,
-    // li : document.getElementsByTagName("li")
   })
-
-  // body = document.getElementsByTagName("body")[0].innerHTML
-  // body = document.getElementsByTagName("body")[0].innerHTML
-  // var bg = chrome.extension.getBackgroundPage()
-  // alert('我是background！')
-  // alert(bg.document.body.innerHTML); 
-  // console.log(bg)
-  // bg.savebodyContent();
-  // download(context, './background.txt', 'text')
-}
-
-function onPlayerReady(e) {
-  let play = document.getElementById("playImg");
-  let pause = document.getElementById("pauseImg");
-
-  play.addEventListener('click', () => {
-    e.target.mute().playVideo();
-  });
-  pause.addEventListener('click', () => e.target.pauseVideo());
-}
-
-function onPlayerStateChange(index) {
-  chrome.storage.local.get('videoImg', (obj) => {
-    document.getElementById('videoPlayerImg').src = obj.videoImg[index]
-  })
-
-  if(document.getElementById("videoPlayer").style.display == 'none'){
-    document.getElementById("videoPlayer").style.display = ''
-    document.getElementById("videoData").style.display = 'none'
-  }
 }
 
 const videoPlay = document.getElementById('play_pause')
@@ -246,214 +313,17 @@ videoPlay.addEventListener('click', () => {
   if(document.getElementById("playImg").style.display == 'none'){
     document.getElementById("playImg").style.display = ''
     document.getElementById("pauseImg").style.display = 'none'
+    youTubePlayerPause()
   } else if(document.getElementById("pauseImg").style.display == 'none'){
     document.getElementById("playImg").style.display = 'none'
     document.getElementById("pauseImg").style.display = ''
+    youTubePlayerPlay()
   }
 });
 
-// const ytButton = document.getElementsByClassName('video')
-// console.log(ytButton)
-// ytButton.addEventListener('click', function() {
-//     console.log('xxx');
-// });
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  // const img = document.querySelectorAll("[id^='playVideoImg']")
-
-  // var img = document.getElementById('playVideoImg0')
-  // img.addEventListener('click', function() {
-  //   console.log('xxx');
-  // });
-
-  // for (var i = 0; i < img.length; i++) {
-  //   img[i].onclick = function(){
-  //     window.close();
-  //     // let id = this.id.substring(this.id.indexOf('playVideoImg'), this.id.length);
-  //     // document.getElementById('' +)
-  //     // ytp-large-play-button ytp-button
-  //     // console.log(id)
-  //   }
-  // }
-});
-
-
-function openVideo(){
-  console.log('twesdfwer')
-}
-
-// (function () {
-//   let img = document.getElementsByTagName('img');
-//   for (let i = 0; i < img.length; i++) {
-//     img[i].addEventListener("click", function() {
-//       let id = img[i].id.substring(img[i].id.indexOf('playVideoImg'), img[i].id.length);
-//       console.log(id)
-//     });
-//   }
-// })
-
-
-// window.close().addEventListener(function(){
-//   chrome.runtime.sendMessage({closed : true})
-// })
-
-function test(){
-  console.log('test')
-}
-
-// chrome.runtime.sendMessage(
-//   {saveState: true, state: document.getElementsByTagName("body")[0].innerHTML}
-// )
-
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-//   if (request.action == "show") {
-//       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-//           console.log(tabs[0].id)
-//       });
-//   }
-// })
-  // if(request.show){
-  //   document.getElementsByTagName("body")[0].innerHTML = request.bodyElements
-  // }
-// })
-// chrome.tabs.sendMessage(integer tabId, any message, function responseCallback)
-
-
-
-// chrome.extension.getBackgroundPage().window.location.reload();
-
-// setInterval(function(){
-//   chrome.storage.local.set({
-//     "body": document.getElementsByTagName("body")[0].innerHTML
-//   })
-// },1000);
-
-// bgPage = chrome.extension.getBackgroundPage();
-
-
-function parseCookie() {
-  var cookieObj = {};
-  var cookieAry = document.cookie.split(';');
-  var cookie;
-  
-  for (var i=0, l=cookieAry.length; i<l; ++i) {
-      cookie = cookieAry[i].trim();
-      cookie = cookie.split('=');
-      cookieObj[cookie[0]] = cookie[1];
-  }
-  
-  return cookieObj;
-}
-
-function getCookieByName(name) {
-  var value = parseCookie()[name];
-  if (value) {
-      value = decodeURIComponent(value);
-  }
-
-  return value;
-}
-
-// (function() {
-
-//   chrome.runtime.onMessage.addListener(
-//       function(request, sender, sendResponse) {
-//           if (request.msg === "bodyContent") {
-//               //  To do something
-//               console.log(request.data.subject)
-//               console.log(request.data.content)
-//               document.getElementsByTagName("body")[0].innerHTML = request.data.body
-//           }
-//       }
-//   );
-
-// }());
-
-// chrome.tabs.query({currentWindow: true,active: true}, function(tabs) {
-//   console.log(tabs)
-// })
-
-// let sessionDataHTML = chrome.storage.local.get('sessionDataHTML', function() {
-//   return document.getElementsByTagName("body")[0].innerHTML
-// })
-
-// chrome.runtime.getBackgroundPage(function(bg){
-//   console.log(bg)
-//   chrome.storage.local.get('body', (obj) => {
-//     // document.getElementsByTagName("body")[0].innerHTML = obj.body
-//   })  
-// })
-
-// function getStorageLocal(){
-//   chrome.storage.local.get('body', (obj) => {
-//     if(obj.body != null && obj.body != undefined){
-//       document.getElementsByTagName("body")[0].innerHTML = obj.body
-//     }
-//   }) 
-// }
- 
-// window.onload = function(){
-//   console.log('重新仔入')
-//   chrome.storage.local.get('body', (obj) => {
-//     if(obj.body != undefined){
-//       document.getElementsByTagName("body")[0].innerHTML = obj.body
-//     }
-//   })  
-// }
-
-// document.addEventListener('DOMContentLoaded', function(){ 
-//   var view = chrome.extension.getBackgroundPage(); 
-//   console.log(view)
-  // chrome.browserAction.setPopup(view); 
-
-//  }); 
-
-
-
-// chrome.storage.local.get('body', (obj) => {
-//   if(obj.body != undefined){
-//     document.getElementsByTagName("body")[0].innerHTML = obj.body
-//     if(searchQuery == searchString.value){
-//       chrome.storage.local.clear()
-//     }
-//   }
-// }) 
-
-// chrome.storage.local.get('state', function(result){
-//   if(result.state){
-//       //This is a function you will write
-//       document.getElementsByTagName("body")[0].innerHTML = result.state
-//   }
-//   else{
-//       //do nothing
-//   }
-// })
-
-// chrome.runtime.onMessage.addListener(
-  // chrome.storage.local.get('body', (obj) => {
-  //   console.log(obj)
-  //   if(obj == undefined){
-  //     document.getElementsByTagName("body")[0].innerHTML = obj.body
-  //   }
-  // })
-// );
-
-// let play = document.getElementsByClassName('ytp-large-play-button')
-// console.log(play)
-// play.forEach(el => {
-//   el.addEventListener('click', function () {
-//     setTimeout(function(){
-//       chrome.runtime.sendMessage({saveState: true, state: document.getElementsByTagName("body")[0].innerHTML})
-//     },5000);
-//   }, true);
-// })
-
-// $('#playVideo0').on('click', function () {
-
-//   player.playVideo();
-
-// });
-
-
-
+const backVideoData = document.getElementById('backVideoData')
+backVideoData.addEventListener('click', () => {
+  document.getElementById('videoPlayerImg').src = ''
+  document.getElementById('videoData').style.display = ''
+  document.getElementById('videoPlayer').style.display = 'none'
+})

@@ -1,3 +1,5 @@
+var youTubePlayer;
+
 window.onload = function () {
   let clickedViedo = null
 
@@ -294,129 +296,110 @@ window.onload = function () {
 
   // listen to contextmenu being opened and save the target image
   document.addEventListener('contextmenu', event => clickedViedo = event.target)
-
-
-  chrome.runtime.onMessage.addListener(generateReport)
-
-  // chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-    // if(request.greeting == 'setVideo') {
-    //   if(request.state){
-        // let bgVideo = document.getElementById('bgVideo')
-  
-        // if(bgVideo == null){
-        //   let div = document.createElement('div')
-        //   div.id = 'bgVideo'
-        //   div.style.display = 'none'
-        //   div.innerHTML = request.state
-        //   document.getElementsByTagName("body")[0].appendChild(div)
-        // }else{
-        //   bgVideo.innerHTML = request.state
-        //   document.getElementsByTagName("body")[0].appendChild(bgVideo)
-        // }
-
-        // let src = document.getElementsByTagName("iframe")[0].src
-        // document.getElementsByTagName("iframe")[0].src = src + '?autoplay=1'
-    //   }
-    // }
-
-    // generateReport(request)
-
-    // if(request.greeting == 'closedPupop'){
-    //   console.log('套件頁面關閉')
-    // }
-
-  // })
-
-  var evt = document.createEvent('MouseEvents');
-  evt.initEvent('play', true, true);
-  var some_element = document;
-  some_element.dispatchEvent(evt);
-
-  document.addEventListener('play', function(e){
-    // chrome.extension.sendMessage({play : true}, function(response) {
-    //   const img = document.querySelectorAll("[id^='playVideoImg']")
-    //   for (var i = 0; i < img.length; i++) {
-    //     img[i].onclick = function(){
-          console.log('test')
-          // let id = this.id.substring(this.id.indexOf('playVideoImg'), this.id.length);
-          // document.getElementById('' +)
-          // ytp-large-play-button ytp-button
-          // console.log(id)
-        // }
-    //   }
-
-    // });
+  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    console.log(request)
+    generateReport(request.getUrl)
   })
-
-//   document.addEventListener('play', function(e){
-//     //send message to ext
-//     var someInformation = {/*your msg here*/}
-//     chrome.extension.sendMessage(someInformation, function(response) {
-//        //callback
-//     });
-//  }, false);
-
-  // listen to message request from the extension: background.js
-  // chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-    
-
-  //   generateReport
-  // });
-
-  // console.log(chrome.action.getUrl('./background.html'))
-
-  // let videoData = document.getElementById('videoData')
-
-  // chrome.action.onClicked.addListener((tab) => {
-  //   chrome.action.setPopup({ tabId: tab.tabId, popup: "popup.html" })
-  //   videoData.appendChild(chrome.action.getUrl('background.html'))
-  // })
-  
 }
 
-const content = '';
+// chrome.storage.local.get('playVideo', (obj) => {
+  // let body = document.getElementsByTagName("body")[0]
+  // console.log(obj.playVideo)
+  // let iframe = ''
+  // body.appendChild()
+  // youTubePlayer.cueVideoById({suggestedQuality: 'tiny',
+  //                             videoId: obj.playVideo.value
+  //                            });
+  // youTubePlayer.pauseVideo();
+// })
 
-function savebodyContent() {
-  content = document.getElementsByTagName("body")[0].innerHTML;
-}
+  
 
-document.addEventListener('DOMContentLoaded', () => {
-  const img = document.querySelectorAll("[id^='playVideoImg']")
-  
-  // var img = document.getElementById('playVideoImg0')
-  // img.addEventListener('click', function() {
-  //   console.log('xxx');
-  // });
-  
-  for (var i = 0; i < img.length; i++) {
-    img[i].onclick = function(){
-      console.log('test123')
-      // let id = this.id.substring(this.id.indexOf('playVideoImg'), this.id.length);
-      // document.getElementById('' +)
-      // ytp-large-play-button ytp-button
-      // console.log(id)
-    }
+function onYouTubeIframeAPIReady() {
+  'use strict';
+
+  var inputVideoId = document.getElementById('YouTube-video-id');
+  var videoId = inputVideoId.value;
+  var suggestedQuality = 'tiny';
+  var height = 180;
+  var width = 320;
+  var youTubePlayerVolumeItemId = 'YouTube-player-volume';
+
+
+  function onError(event) {
+      youTubePlayer.personalPlayer.errors.push(event.data);
   }
-  })
-  
-
-//收到訊息之後，在目前網頁內容丟隱藏的影片標籤
 
 
-// chrome.runtime.onConnect.addListener(function(port){
-//   port.onDisconnect.addListener(function(event) {
-//     alert(document.getElementsByTagName("body")[0].innerHTML)
-//     // content = document.getElementsByTagName("body")[0].innerHTML;
-//   })
-// })
+  function onReady(event) {
+      var player = event.target;
 
-// chrome.runtime.onConnect.addListener(function (externalPort) {
-//   externalPort.onDisconnect.addListener(function () {
-//     console.log("onDisconnect")
-//     // Do stuff that should happen when popup window closes here
-//   })
-
-//   console.log("onConnect")
-// })
+      player.loadVideoById({suggestedQuality: suggestedQuality,
+                            videoId: videoId
+                           });
+      player.pauseVideo();
+  }
 
 
+  function onStateChange(event) {
+      var volume = Math.round(event.target.getVolume());
+      var volumeItem = document.getElementById(youTubePlayerVolumeItemId);
+
+      if (volumeItem && (Math.round(volumeItem.value) != volume)) {
+          volumeItem.value = volume;
+      }
+  }
+
+
+  youTubePlayer = new YT.Player('YouTube-player',
+                                {videoId: videoId,
+                                 height: height,
+                                 width: width,
+                                 playerVars: {'autohide': 0,
+                                              'cc_load_policy': 0,
+                                              'controls': 2,
+                                              'disablekb': 1,
+                                              'iv_load_policy': 3,
+                                              'modestbranding': 1,
+                                              'rel': 0,
+                                              'showinfo': 0,
+                                              'start': 3
+                                             },
+                                 events: {'onError': onError,
+                                          'onReady': onReady,
+                                          'onStateChange': onStateChange
+                                         }
+                                });
+
+  // Add private data to the YouTube object
+  youTubePlayer.personalPlayer = {'currentTimeSliding': false,
+                                  'errors': []};
+}
+
+function youTubePlayerActive() {
+  'use strict';
+
+  return youTubePlayer && youTubePlayer.hasOwnProperty('getPlayerState');
+}
+
+/**
+ * Pause.
+ */
+ function youTubePlayerPause() {
+  'use strict';
+
+  if (youTubePlayerActive()) {
+      youTubePlayer.pauseVideo();
+  }
+}
+
+/**
+ * Play.
+ */
+ function youTubePlayerPlay() {
+  'use strict';
+
+  if (youTubePlayerActive()) {
+      youTubePlayer.playVideo();
+  }
+}
