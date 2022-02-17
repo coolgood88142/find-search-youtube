@@ -302,6 +302,27 @@ window.onload = function () {
   })
 }
 
+chrome.runtime.onConnect.addListener(function(port) {
+  port.onDisconnect.addListener(function () {
+    
+    // document.getElementById('player').play();
+  })
+})
+
+// chrome.runtime.onMessage.addListener(({ type, name }) => {
+//   if (type === "set-name") {
+//     chrome.storage.local.set({ name });
+//   }
+// });
+
+// chrome.action.onClicked.addListener((tab) => {
+//   console.log(tab)
+//   chrome.storage.local.get(["name"], ({ name }) => {
+//     chrome.tabs.sendMessage(tab.id, { name });
+//   });
+// });
+
+
 // chrome.storage.local.get('playVideo', (obj) => {
   // let body = document.getElementsByTagName("body")[0]
   // console.log(obj.playVideo)
