@@ -1,7 +1,20 @@
 var youTubePlayer;
-
 window.onload = function () {
   let clickedViedo = null
+  let body = document.getElementsByTagName("body")[0]
+  let input = document.createElement('input')
+  input.id = 'YouTube-video-id'
+  input.type = 'hidden'
+  input.value = 'yPkS7yiTHP4'
+  input.pattern = '[_\-0-9A-Za-z]{11}'
+
+  let div = document.createElement('div')
+  div.id = 'YouTube-player'
+  div.style.display = 'none'
+  body.appendChild(input)
+  body.appendChild(div)
+  onYouTubeIframeAPIReady()
+
 
   // generate a table for each format
   function generateTableRow(title, release, info, releaseDate, tags, link) {
@@ -276,7 +289,7 @@ window.onload = function () {
     document.querySelector('.closebtn').addEventListener('click', event => event.target.parentElement.remove())
   }
 
-  function generateReport(request) {
+  function videoData(request) {
     // show error message if getUrl is false or clickImg is null
     if (!request.getUrl || !clickedViedo) { return showErrorMessage() }
     // generate tbody
@@ -296,49 +309,37 @@ window.onload = function () {
 
   // listen to contextmenu being opened and save the target image
   document.addEventListener('contextmenu', event => clickedViedo = event.target)
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    console.log(request)
-    generateReport(request.getUrl)
-  })
+  // chrome.runtime.onMessage.addListener(videoData)
+
+  chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+      if( request.videoId !== undefined && request.videoId !== null ) {
+        document.getElementById('YouTube-video-id').value = request.videoId
+        youTubePlayer.cueVideoById({suggestedQuality: 'tiny',
+                                videoId: request.videoId
+                               });
+        youTubePlayer.pauseVideo();
+      } else if(request.backgroundVideoPlay !== undefined && request.backgroundVideoPlay !== null ){
+        youTubePlayerPlay()
+      } else if(request.backgroundVideoPause !== undefined && request.backgroundVideoPause !== null ){
+        youTubePlayerPause()
+      }
+    }
+  );
+
+  // chrome.action.onClicked.addListener((tab) => {
+  //   chrome.scripting.executeScript({      
+  //     target: {
+  //       tabId: tab.id
+  //     },     
+  //     files: ['youtube.js'],   
+  //   });
+  // })
 }
 
-chrome.runtime.onConnect.addListener(function(port) {
-  port.onDisconnect.addListener(function () {
-    
-    // document.getElementById('player').play();
-  })
-})
-
-// chrome.runtime.onMessage.addListener(({ type, name }) => {
-//   if (type === "set-name") {
-//     chrome.storage.local.set({ name });
-//   }
-// });
-
-// chrome.action.onClicked.addListener((tab) => {
-//   console.log(tab)
-//   chrome.storage.local.get(["name"], ({ name }) => {
-//     chrome.tabs.sendMessage(tab.id, { name });
-//   });
-// });
-
-
-// chrome.storage.local.get('playVideo', (obj) => {
-  // let body = document.getElementsByTagName("body")[0]
-  // console.log(obj.playVideo)
-  // let iframe = ''
-  // body.appendChild()
-  // youTubePlayer.cueVideoById({suggestedQuality: 'tiny',
-  //                             videoId: obj.playVideo.value
-  //                            });
-  // youTubePlayer.pauseVideo();
-// })
-
-  
 
 function onYouTubeIframeAPIReady() {
   'use strict';
-
   var inputVideoId = document.getElementById('YouTube-video-id');
   var videoId = inputVideoId.value;
   var suggestedQuality = 'tiny';
@@ -396,6 +397,32 @@ function onYouTubeIframeAPIReady() {
   youTubePlayer.personalPlayer = {'currentTimeSliding': false,
                                   'errors': []};
 }
+
+
+// chrome.runtime.onMessage.addListener(({ type, name }) => {
+//   if (type === "set-name") {
+//     chrome.storage.local.set({ name });
+//   }
+// });
+
+// chrome.action.onClicked.addListener((tab) => {
+//   console.log(tab)
+//   chrome.storage.local.get(["name"], ({ name }) => {
+//     chrome.tabs.sendMessage(tab.id, { name });
+//   });
+// });
+
+
+// chrome.storage.local.get('playVideo', (obj) => {
+  // let body = document.getElementsByTagName("body")[0]
+  // console.log(obj.playVideo)
+  // let iframe = ''
+  // body.appendChild()
+  // youTubePlayer.cueVideoById({suggestedQuality: 'tiny',
+  //                             videoId: obj.playVideo.value
+  //                            });
+  // youTubePlayer.pauseVideo();
+// })
 
 function youTubePlayerActive() {
   'use strict';

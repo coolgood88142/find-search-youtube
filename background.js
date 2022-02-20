@@ -21,10 +21,10 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
     }
 })
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-  if(request.playVideo){
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, { playVideo: request.playVideo })
-    })
-  }
-})
+// chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+//   if(request.playVideo){
+//     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+//       chrome.tabs.sendMessage(tabs[0].id, { playVideo: request.playVideo })
+//     })
+//   }
+// })

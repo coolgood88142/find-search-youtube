@@ -34,9 +34,20 @@
       ],
       "js": [
         "js/axios.min.js",
-        "js/content.js"
+        "js/content.js",
+        "script.js",
+        "www-widgetapi.js"
       ]
     }
   ],
-  "manifest_version": 3
+  "manifest_version": 3,
+  "web_accessible_resources": [
+    {
+      "resources": [ "www-widgetapi.js" ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "sendbox": "script-src 'self' https://www.youtube.com; object-src 'self'"
+  }
 }
